@@ -28,7 +28,7 @@ async function dbupdate(userid, key, values) {
   updateExpression = updateExpression.slice(0, -1);
 
   try {
-    await db.update({
+    await users.update({
       TableName: 'userdata',
       Key: { userid },
       UpdateExpression: `SET ${updateExpression}`,
@@ -42,7 +42,7 @@ async function dbupdate(userid, key, values) {
 
 async function dbget(userid) {
   try {
-    const result = await db.get({
+    const result = await users.get({
       TableName: 'userdata',
       Key: { userid },
     });
@@ -56,7 +56,7 @@ async function dbget(userid) {
 
 async function dbcreate(userid) {
   try {
-    await db.put({
+    await users.set({
       TableName: 'userdata',
       Item: { userid },
       ConditionExpression: 'attribute_not_exists(userid)',
@@ -68,7 +68,7 @@ async function dbcreate(userid) {
 
 async function dbdelete(userid) {
   try {
-    await db.delete({
+    await users.delete({
       TableName: 'userdata',
       Key: { userid },
     });
