@@ -6,7 +6,7 @@ const { Telegraf, Markup } = require("telegraf");
 const { message } = require("telegraf/filters");
 const axios = require("axios");
 const { transcript } = require("./transcript");
-const { dbcreate, dbget, dbupdate } = require("./dbfunc");
+const { dbcreate, dbget, dbupdate } = require("./cyclicdb");
 
 //database
 
