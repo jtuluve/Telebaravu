@@ -16,8 +16,8 @@ async function connectDB(){
   
 }
 
-async function dbupdate(userid, key, values) {
-  if (key.length !== values.length) {
+async function dbupdate(userid, keys, values) {
+  if (keys.length !== values.length) {
     console.log("Key and values length difference error");
     return;
   }
@@ -25,8 +25,8 @@ async function dbupdate(userid, key, values) {
   await dbcreate(userid);
 
   const updateObj = {};
-  for (let i = 0; i < key.length; i++) {
-    updateObj[key[i]] = values[i];
+  for (let i = 0; i < keys.length; i++) {
+    updateObj[keys[i]] = values[i];
   }
 
   try {
@@ -39,6 +39,7 @@ async function dbupdate(userid, key, values) {
 async function dbget(userid, func) {
   try {
     const result = await users.findOne({ userid });
+    console.log(result._doc)
     func(result?._doc)
     return result || null;
   } catch (err) {
