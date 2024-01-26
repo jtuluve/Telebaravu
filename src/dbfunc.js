@@ -1,18 +1,18 @@
 const mongoose = require("mongoose");
 
+
+const userSchema = new mongoose.Schema({
+  userid: { type: Number, unique: true },
+  color: { type: String, default: "red" },
+  font: { type: String, default: "baravu" },
+  format: { type: String, default: "png" },
+  count: { type: Number, default: 0 },
+});
+
+const users = mongoose.model("user", userSchema);
 async function connectDB(){
   
   await mongoose.connect(process.env.MONGO_URL);
-  
-  const userSchema = new mongoose.Schema({
-    userid: { type: Number, unique: true },
-    color: { type: String, default: "red" },
-    font: { type: String, default: "baravu" },
-    format: { type: String, default: "png" },
-    count: { type: Number, default: 0 },
-  });
-  
-  const users = mongoose.model("user", userSchema);
   
 }
 
