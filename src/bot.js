@@ -112,11 +112,11 @@ bot.command("image", (ctx) => {
 bot.on("message:sticker", (ctx) => ctx.reply("❤️"));
 
 bot.on("message:text", async (ctx) => {
+  let msg = await bot.api.sendMessage(
+    ctx.message.from.id,
+    "It will take some time for me to generate png. Please wait..😇"
+  );
   dbget(ctx.message.from.id, async (row) => {
-    let msg = await bot.api.sendMessage(
-      ctx.message.from.id,
-      "It will take some time for me to generate png. Please wait..😇"
-    );
     let txt = ctx.message.text;
 
     txt = transcript(txt);
