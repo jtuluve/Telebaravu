@@ -1,12 +1,9 @@
 const { webhookCallback, Bot, InlineKeyboard, InputFile } = require("grammy");
 
 const express = require("express");
-
-const { Telegraf, Markup } = require("telegraf");
-const { message } = require("telegraf/filters");
 const axios = require("axios");
 const { transcript } = require("./transcript");
-const { dbcreate, dbget, dbupdate } = require("./cyclicdb");
+const { dbcreate, dbget, dbupdate } = require("./dbfunc");
 
 //database
 
