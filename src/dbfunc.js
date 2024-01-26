@@ -36,9 +36,10 @@ async function dbupdate(userid, key, values) {
   }
 }
 
-async function dbget(userid) {
+async function dbget(userid, func) {
   try {
     const result = await users.findOne({ userid });
+    func(result?._doc)
     return result || null;
   } catch (err) {
     console.log(err);
