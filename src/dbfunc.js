@@ -1,16 +1,20 @@
 const mongoose = require("mongoose");
 
-mongoose.connect(process.env.MONGO_URL);
-
-const userDataSchema = new mongoose.Schema({
-  userid: { type: Number, unique: true },
-  color: { type: String, default: "red" },
-  font: { type: String, default: "baravu" },
-  format: { type: String, default: "png" },
-  count: { type: Number, default: 0 },
-});
-
-const UserData = mongoose.model("UserData", userDataSchema);
+async function connectDB(){
+  
+  await mongoose.connect(process.env.MONGO_URL);
+  
+  const userSchema = new mongoose.Schema({
+    userid: { type: Number, unique: true },
+    color: { type: String, default: "red" },
+    font: { type: String, default: "baravu" },
+    format: { type: String, default: "png" },
+    count: { type: Number, default: 0 },
+  });
+  
+  const users = mongoose.model("user", userSchema);
+  
+}
 
 async function dbupdate(userid, key, values) {
   if (key.length !== values.length) {
@@ -26,7 +30,7 @@ async function dbupdate(userid, key, values) {
   }
 
   try {
-    await UserData.updateOne({ userid }, { $set: updateObj });
+    await users.updateOne({ userid }, { $set: updateObj });
   } catch (err) {
     console.log(err);
   }
@@ -34,7 +38,7 @@ async function dbupdate(userid, key, values) {
 
 async function dbget(userid) {
   try {
-    const result = await UserData.findOne({ userid });
+    const result = await users.findOne({ userid });
     return result || null;
   } catch (err) {
     console.log(err);
@@ -44,7 +48,7 @@ async function dbget(userid) {
 
 async function dbcreate(userid) {
   try {
-    await UserData.updateOne(
+    await users.updateOne(
       { userid },
       { $setOnInsert: { userid } },
       { upsert: true }
@@ -56,7 +60,7 @@ async function dbcreate(userid) {
 
 async function dbdelete(userid) {
   try {
-    await UserData.deleteOne({ userid });
+    await users.deleteOne({ userid });
   } catch (err) {
     console.log(err);
   }
@@ -64,7 +68,7 @@ async function dbdelete(userid) {
 
 async function incrementCount(userid) {
   try {
-    await UserData.updateOne({ userid }, { $inc: { count: 1 } });
+    await users.updateOne({ userid }, { $inc: { count: 1 } });
   } catch (err) {
     console.log(err);
   }
@@ -75,3 +79,4 @@ exports.dbupdate = dbupdate;
 exports.dbdelete = dbdelete;
 exports.dbget = dbget;
 exports.incrementCount = incrementCount;
+exports.connectDB = connectDB;

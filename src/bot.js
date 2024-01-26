@@ -3,7 +3,7 @@ const { webhookCallback, Bot, InlineKeyboard, InputFile } = require("grammy");
 const express = require("express");
 const axios = require("axios");
 const { transcript } = require("./transcript");
-const { dbcreate, dbget, dbupdate } = require("./dbfunc");
+const { connectDB, dbcreate, dbget, dbupdate } = require("./dbfunc");
 
 //database
 
@@ -151,9 +151,11 @@ if (process.env.NODE_ENV === "production") {
   app.use(webhookCallback(bot, "express"));
 
   const PORT = process.env.PORT;
-  app.listen(PORT, () => {
-    console.log(`Bot listening on port ${PORT}`);
-  });
+  connectDB().then(() =>
+    app.listen(PORT, () => {
+      console.log(`Bot listening on port ${PORT}`);
+    })
+  );
 } else {
   // Use Long Polling for development
   bot.start();
