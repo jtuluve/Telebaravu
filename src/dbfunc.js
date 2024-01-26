@@ -12,7 +12,7 @@ const userDataSchema = new mongoose.Schema({
 
 const UserData = mongoose.model("UserData", userDataSchema);
 
-export async function dbupdate(userid, key, values) {
+async function dbupdate(userid, key, values) {
   if (key.length !== values.length) {
     console.log("Key and values length difference error");
     return;
@@ -32,7 +32,7 @@ export async function dbupdate(userid, key, values) {
   }
 }
 
-export async function dbget(userid) {
+async function dbget(userid) {
   try {
     const result = await UserData.findOne({ userid });
     return result || null;
@@ -42,7 +42,7 @@ export async function dbget(userid) {
   }
 }
 
-export async function dbcreate(userid) {
+async function dbcreate(userid) {
   try {
     await UserData.updateOne(
       { userid },
@@ -54,7 +54,7 @@ export async function dbcreate(userid) {
   }
 }
 
-export async function dbdelete(userid) {
+async function dbdelete(userid) {
   try {
     await UserData.deleteOne({ userid });
   } catch (err) {
@@ -62,10 +62,16 @@ export async function dbdelete(userid) {
   }
 }
 
-export async function incrementCount(userid) {
+async function incrementCount(userid) {
   try {
     await UserData.updateOne({ userid }, { $inc: { count: 1 } });
   } catch (err) {
     console.log(err);
   }
 }
+
+exports.dbcreate = dbcreate;
+exports.dbupdate = dbupdate;
+exports.dbdelete = dbdelete;
+exports.dbget = dbget;
+exports.incrementCount = incrementCount;
