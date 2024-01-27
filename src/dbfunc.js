@@ -40,12 +40,17 @@ async function dbupdate(userid, keys, values) {
   }
 }
 
+/**
+ * 
+ * @param {Number|string} userid 
+ * @param {(row)=>Promise<any>} func 
+ * @returns 
+ */
 async function dbget(userid, func) {
   try {
     const result = await users.findOne({ userid });
     console.log("doc:",result._doc);
     await func(result?._doc);
-    return result?._doc || null;
   } catch (err) {
     console.log(err);
     return null;
