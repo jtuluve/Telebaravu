@@ -130,6 +130,7 @@ bot.on("message:text", async (ctx) => {
         `https://tulu-png-api2.glitch.me/image?text=${txt}&font=${font}&color=${color}`
       )
       .then(async (response) => {
+        console.log("response:",response);
         await ctx.replyWithDocument(
           new InputFile(new URL(response.data.url), "image.png")
         );
