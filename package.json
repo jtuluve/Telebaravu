@@ -22,5 +22,6 @@
     "lodash": "^4.17.21",
     "mongoose": "^8.1.1",
     "node-fetch": "^3.3.2"
-  }
+  },
+  "type": "module"
 }
