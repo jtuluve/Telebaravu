@@ -11,8 +11,12 @@ const userSchema = new mongoose.Schema({
 
 const users = mongoose.model("user", userSchema);
 async function connectDB(){
-  
-  await mongoose.connect(process.env.MONGO_URL);
+  try {
+    await mongoose.connect(process.env.MONGO_URL);
+    console.log("Connected to db.")
+  } catch (error) {
+    console.error(error)
+  }
   
 }
 
@@ -39,8 +43,8 @@ async function dbupdate(userid, keys, values) {
 async function dbget(userid, func) {
   try {
     const result = await users.findOne({ userid });
-    console.log(result._doc)
-    func(result?._doc)
+    console.log("doc:",result._doc);
+    func(result?._doc);
     return result || null;
   } catch (err) {
     console.log(err);
