@@ -117,6 +117,7 @@ bot.on("message:text", async (ctx) => {
     "It will take some time for me to generate png. Please wait..😇"
   );
   dbget(ctx.message.from.id, async (row) => {
+    console.log(row)
     let txt = ctx.message.text;
 
     txt = transcript(txt);
