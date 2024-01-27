@@ -142,9 +142,9 @@ bot.on("message:text", async (ctx) => {
 
 // Start the server
 if (process.env.NODE_ENV === "production") {
-  bot.api.setWebhook(process.env.CYCLIC_URL, {
+  bot.api.setWebhook(process.env.CYCLIC_URL/* , {
     secret_token: process.env.WEBHOOK_TOKEN,
-  });
+  } */);
   // Use Webhooks for the production server
   const app = express();
   app.use(express.json());
