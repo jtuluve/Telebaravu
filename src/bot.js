@@ -1,7 +1,7 @@
 const { webhookCallback, Bot, InlineKeyboard, InputFile } = require("grammy");
 
 const express = require("express");
-const axios = require("axios");
+const fetch = require("node-fetch");
 const { transcript } = require("./transcript");
 const { connectDB, dbcreate, dbget, dbupdate } = require("./dbfunc");
 
@@ -11,10 +11,14 @@ const bot = new Bot(process.env.BOT_TOKEN);
 //const http = require('https');
 // Bot code
 //bot.telegram.setWebhook('https://mesquite-private-jay.glitch.me/');
-bot.on("message", (ctx, next) => {
+bot.on("message", async (ctx, next) => {
   console.log(ctx);
-  dbcreate(ctx.chat.id);
-  axios.get(`https://tulu-png-api2.glitch.me/`);
+  try {
+    await dbcreate(ctx.chat.id);
+    await axios.get(`https://tulu-png-api2.glitch.me/`);
+  } catch (e) {
+    console.error("line 20: ", e);
+  }
   return next();
 });
 bot.command("start", (ctx) => {
@@ -117,36 +121,39 @@ bot.on("message:text", async (ctx) => {
     "It will take some time for me to generate png. Please wait..😇"
   );
   await dbget(ctx.message.from.id, async (row) => {
-    console.log(row)
+    console.log(row);
     let txt = ctx.message.text;
 
     txt = transcript(txt);
     txt = encodeURIComponent(txt);
     let color = row ? row.color : "red";
     let font = row ? row.font : "baravu";
-
-    axios
-      .get(
+    try {
+      console.log("started fetch");
+      let response = await fetch(
         `https://tulu-png-api2.glitch.me/image?text=${txt}&font=${font}&color=${color}`
-      )
-      .then(async (response) => {
-        console.log("response:",response);
-        await ctx.replyWithDocument(
-          new InputFile(new URL(response.data.url), "image.png")
-        );
-        bot.api.deleteMessage(ctx.message.from.id, msg.message_id);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
+      );
+      console.log("finished fetch");
+
+      response = await response.json();
+      console.log("response:", response);
+      await ctx.replyWithDocument(
+        new InputFile(new URL(response.data.url), "image.png")
+      );
+      bot.api.deleteMessage(ctx.message.from.id, msg.message_id);
+    } catch (e) {
+      console.log(e);
+    }
   });
 });
 
 // Start the server
 if (process.env.NODE_ENV === "production") {
-  bot.api.setWebhook(process.env.CYCLIC_URL/* , {
+  bot.api.setWebhook(
+    process.env.CYCLIC_URL /* , {
     secret_token: process.env.WEBHOOK_TOKEN,
-  } */);
+  } */
+  );
   // Use Webhooks for the production server
   const app = express();
   app.use(express.json());
