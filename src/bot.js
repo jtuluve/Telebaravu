@@ -126,6 +126,7 @@ bot.on("message:text", async (ctx) => {
 
     txt = transcript(txt);
     txt = encodeURIComponent(txt);
+    console.log("txt: ",txt);
     let color = row ? row.color : "red";
     let font = row ? row.font : "baravu";
     try {
