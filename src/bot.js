@@ -7,7 +7,6 @@ const express = require("express");
 const {default:fetch} = await import("node-fetch")
 const { transcript } = require("./transcript");
 const { connectDB, dbcreate, dbget, dbupdate, incrementCount } = require("./dbfunc");
-console.log(fetch)
 //database
 
 const bot = new Bot(process.env.BOT_TOKEN);
@@ -15,7 +14,6 @@ const bot = new Bot(process.env.BOT_TOKEN);
 // Bot code
 //bot.telegram.setWebhook('https://mesquite-private-jay.glitch.me/');
 bot.on("message", async (ctx, next) => {
-  console.log(ctx);
   try {
     await dbcreate(ctx.message.from.id);
     fetch(`https://tulu-png-api2.glitch.me/`);
@@ -124,23 +122,18 @@ bot.on("message:text", async (ctx) => {
     "It will take some time for me to generate png. Please wait..😇"
   );
   await dbget(ctx.message.from.id, async (row) => {
-    console.log(row);
     let txt = ctx.message.text;
 
     txt = transcript(txt);
     txt = encodeURIComponent(txt);
-    console.log("txt: ",txt);
     let color = row ? row.color : "red";
     let font = row ? row.font : "baravu";
     try {
-      console.log("started fetch");
       let response = await fetch(
         `https://tulu-png-api2.glitch.me/image?text=${txt}&font=${font}&color=${color}`
       );
-      console.log("finished fetch");
 
       response = await response.json();
-      console.log("response:", response);
       await ctx.replyWithDocument(
         new InputFile(new URL(response.url), "image.png")
       );
