@@ -22,7 +22,7 @@ async function connectDB(){
 
 async function dbupdate(userid, keys, values) {
   if (keys.length !== values.length) {
-    console.log("Key and values length difference error");
+    console.error("Key and values length difference error");
     return;
   }
 
@@ -36,7 +36,7 @@ async function dbupdate(userid, keys, values) {
     }
     await users.findOneAndUpdate({userid},{userid,...updateObj},{upsert:true});
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
@@ -51,7 +51,7 @@ async function dbget(userid, func) {
     const result = await users.findOne({ userid });
     await func(result?._doc);
   } catch (err) {
-    console.log(err);
+    console.error(err);
     return null;
   }
 }
@@ -60,7 +60,7 @@ async function dbcreate(userid) {
   try {
     await users.updateOne({ userid }, { userid }, {upsert:true});
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
@@ -68,7 +68,7 @@ async function dbdelete(userid) {
   try {
     await users.deleteOne({ userid });
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
@@ -78,7 +78,7 @@ async function incrementCount(userid) {
       await dbupdate(userid, ["count"], [user.count + 1]);
     })
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 }
 
