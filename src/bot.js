@@ -1,7 +1,7 @@
 const { webhookCallback, Bot, InlineKeyboard, InputFile } = require("grammy");
 
 const express = require("express");
-import fetch from "node-fetch";
+const {fetch} =  require("node-fetch");
 const { transcript } = require("./transcript");
 const { connectDB, dbcreate, dbget, dbupdate } = require("./dbfunc");
 
