@@ -34,7 +34,7 @@ async function dbupdate(userid, keys, values) {
   }
 
   try {
-    await users.updateOne({ userid }, { $set: updateObj });
+    await users.updateOne({ userid }, updateObj, {upsert:true});
   } catch (err) {
     console.log(err);
   }
@@ -59,11 +59,7 @@ async function dbget(userid, func) {
 
 async function dbcreate(userid) {
   try {
-    await users.updateOne(
-      { userid },
-      { $setOnInsert: { userid } },
-      { upsert: true }
-    );
+    await users.updateOne({ userid }, { userid }, {upsert:true});
   } catch (err) {
     console.log(err);
   }
@@ -79,7 +75,7 @@ async function dbdelete(userid) {
 
 async function incrementCount(userid) {
   try {
-    await users.updateOne({ userid }, { $inc: { count: 1 } });
+    await users.updateOne({ userid }, updateObj, {upsert:true});
   } catch (err) {
     console.log(err);
   }

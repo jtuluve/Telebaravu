@@ -1,10 +1,13 @@
+(async()=>{
+
+
 const { webhookCallback, Bot, InlineKeyboard, InputFile } = require("grammy");
 
 const express = require("express");
-const {fetch} =  require("node-fetch");
+const {default:fetch} = await import("node-fetch")
 const { transcript } = require("./transcript");
-const { connectDB, dbcreate, dbget, dbupdate } = require("./dbfunc");
-
+const { connectDB, dbcreate, dbget, dbupdate, incrementCount } = require("./dbfunc");
+console.log(fetch)
 //database
 
 const bot = new Bot(process.env.BOT_TOKEN);
@@ -14,8 +17,8 @@ const bot = new Bot(process.env.BOT_TOKEN);
 bot.on("message", async (ctx, next) => {
   console.log(ctx);
   try {
-    await dbcreate(ctx.chat.id);
-    await axios.get(`https://tulu-png-api2.glitch.me/`);
+    await dbcreate(ctx.message.from.id);
+    fetch(`https://tulu-png-api2.glitch.me/`);
   } catch (e) {
     console.error("line 20: ", e);
   }
@@ -139,9 +142,10 @@ bot.on("message:text", async (ctx) => {
       response = await response.json();
       console.log("response:", response);
       await ctx.replyWithDocument(
-        new InputFile(new URL(response.data.url), "image.png")
+        new InputFile(new URL(response.url), "image.png")
       );
       bot.api.deleteMessage(ctx.message.from.id, msg.message_id);
+      incrementCount(ctx.message.from.id)
     } catch (e) {
       console.log(e);
     }
@@ -167,6 +171,10 @@ if (process.env.NODE_ENV === "production") {
     })
   );
 } else {
+  connectDB().then(()=>bot.start())
   // Use Long Polling for development
-  bot.start();
+  // bot.start();
 }
+
+
+})()
