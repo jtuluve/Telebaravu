@@ -140,7 +140,7 @@ bot.on("message:text", async (ctx) => {
       bot.api.deleteMessage(ctx.message.from.id, msg.message_id);
       incrementCount(ctx.message.from.id)
     } catch (e) {
-      console.log(e);
+      console.error(e);
     }
   });
 });
