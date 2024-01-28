@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 
-
 const userSchema = new mongoose.Schema({
   userid: { type: Number, unique: true },
   color: { type: String, default: "red" },
@@ -12,6 +11,7 @@ const userSchema = new mongoose.Schema({
 const users = mongoose.model("user", userSchema);
 async function connectDB(){
   try {
+    if(mongoose.connection.readyState===1) throw "Already connected";
     await mongoose.connect(process.env.MONGO_URL);
     console.log("Connected to db.")
   } catch (error) {
@@ -28,13 +28,13 @@ async function dbupdate(userid, keys, values) {
 
   await dbcreate(userid);
 
-  const updateObj = {};
-  for (let i = 0; i < keys.length; i++) {
-    updateObj[keys[i]] = values[i];
-  }
-
+  
   try {
-    await users.updateOne({ userid }, updateObj, {upsert:true});
+    let updateObj = {};
+    for (let i = 0; i < keys.length; i++) {
+      updateObj[keys[i]] = values[i];
+    }
+    await users.findOneAndUpdate({userid},{userid,...updateObj},{upsert:true});
   } catch (err) {
     console.log(err);
   }
@@ -49,7 +49,6 @@ async function dbupdate(userid, keys, values) {
 async function dbget(userid, func) {
   try {
     const result = await users.findOne({ userid });
-    console.log("doc:",result._doc);
     await func(result?._doc);
   } catch (err) {
     console.log(err);
@@ -75,7 +74,9 @@ async function dbdelete(userid) {
 
 async function incrementCount(userid) {
   try {
-    await users.updateOne({ userid }, updateObj, {upsert:true});
+    await dbget(userid, async (user) =>{
+      await dbupdate(userid, ["count"], [user.count + 1]);
+    })
   } catch (err) {
     console.log(err);
   }
