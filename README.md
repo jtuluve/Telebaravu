@@ -1,10 +1,10 @@
 # Telebaravu
 
-*Original source: [Tulu-Png-Bot](https://github.com/jtuluve/Tulu-Png-Bot)*
+*Original source: [jtuluve/Tulu-Png-Bot](https://github.com/jtuluve/Tulu-Png-Bot)*
 
 Telebaravu is a Telegram bot that generates PNG images in Tulu Script for given text inputs in Kannada, Malayalam, or Hindi. It serves as a transliterator, providing users with Tulu-scripted representations of their input text.
 
-**Context:** This repository is a variant of the original [Tulu-Png-Bot](https://github.com/jtuluve/Tulu-Png-Bot) project. The key difference lies in the use of [Grammy](https://grammy.dev) as the Telegram bot framework instead of [Telegraf](https://telegrafjs.org/). This adaptation allows the bot to be hosted on [Cyclic](https://cyclic.sh). Special acknowledgment goes to the [main repository](https://github.com/cyclic-software/starter-telegram-bot) by Cyclic, providing a template for hosting the bot cyclic.
+**Context:** This repository is a variant of the original [Tulu-Png-Bot](https://github.com/jtuluve/Tulu-Png-Bot) project. The key difference lies in the use of [Grammy](https://grammy.dev) as the Telegram bot framework instead of [Telegraf](https://telegrafjs.org/). This adaptation allows the bot to be hosted on [Cyclic](https://cyclic.sh). Special acknowledgment goes to the [main repository](https://github.com/cyclic-software/starter-telegram-bot) by Cyclic, providing a template for hosting the bot in cyclic.
 
 ## Tech Stack
 
