@@ -180,7 +180,7 @@ async function broadcastMessage(message) {
   for (const user of users) {
     let userId = user.userid;
     try {
-      await bot.telegram.sendMessage(userId, message);
+      await bot.api.sendMessage(userId, message);
     } catch (error) {
       // Check if it's a rate limit error
       if (error.code === 429) {
@@ -189,9 +189,9 @@ async function broadcastMessage(message) {
         await new Promise(resolve => setTimeout(resolve, waitTime * 1001)); // Wait for the specified time
 
         // Once the wait is over, attempt to send the message again
-        await bot.telegram.sendMessage(userId, message);
+        await bot.api.sendMessage(userId, message);
       } else {
-        console.log(`Failed to send message to ${userId}:`, error.description);
+        console.log(`Failed to send message to ${userId}:`, error);
         await dbdelete(userId);
       }
     }
