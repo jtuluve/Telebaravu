@@ -12,9 +12,10 @@ const { connectDB, dbcreate, dbget, dbupdate, incrementCount, dbdelete } = requi
 const bot = new Bot(process.env.BOT_TOKEN);
 // Bot code
 
-bot.command(process.env.BROADCAST_CODE,async(ctx)=>{
+bot.command(process.env.BROADCAST_CODE,(ctx)=>{
   let message = ctx.message.text.slice(process.env.BROADCAST_CODE.length+1);
-  await broadcastMessage(message);
+  broadcastMessage(message);
+  return ctx.reply("Broadcasting message.")
 })
 
 bot.on("message", async (ctx, next) => {
