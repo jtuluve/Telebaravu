@@ -154,6 +154,7 @@ if (process.env.NODE_ENV === "production") {
   bot.api.setWebhook(
     process.env.CYCLIC_URL , {
     secret_token: process.env.WEBHOOK_TOKEN,
+    
   });
   // Use Webhooks for the production server
   const app = express();
@@ -175,8 +176,9 @@ if (process.env.NODE_ENV === "production") {
 
 
 async function broadcastMessage(message) {
-  const userIds = await dbget();
-  for (const userId of userIds) {
+  const users = await dbget();
+  for (const user of users) {
+    let userId = user.userId;
     try {
       await bot.telegram.sendMessage(userId, message);
     } catch (error) {
