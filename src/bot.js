@@ -6,19 +6,23 @@ const { webhookCallback, Bot, InlineKeyboard, InputFile } = require("grammy");
 const express = require("express");
 const {default:fetch} = await import("node-fetch")
 const { transcript } = require("./transcript");
-const { connectDB, dbcreate, dbget, dbupdate, incrementCount } = require("./dbfunc");
+const { connectDB, dbcreate, dbget, dbupdate, incrementCount, dbdelete } = require("./dbfunc");
 //database
 
 const bot = new Bot(process.env.BOT_TOKEN);
-//const http = require('https');
 // Bot code
-//bot.telegram.setWebhook('https://mesquite-private-jay.glitch.me/');
+
+bot.command(process.env.BROADCAST_CODE,async(ctx)=>{
+  let message = ctx.message.text.slice(process.env.BROADCAST_CODE.length+1);
+  await broadcastMessage(message);
+})
+
 bot.on("message", async (ctx, next) => {
   try {
     await dbcreate(ctx.message.from.id);
     fetch(`https://tulu-png-api2.glitch.me/`);
   } catch (e) {
-    console.error("line 20: ", e);
+    console.error("line 25: ", e);
   }
   return next();
 });
@@ -163,10 +167,37 @@ if (process.env.NODE_ENV === "production") {
     })
   );
 } else {
-  connectDB().then(()=>bot.start())
   // Use Long Polling for development
-  // bot.start();
+  connectDB().then(()=>bot.start())
 }
 
 
+
+
+async function broadcastMessage(message) {
+  const userIds = await dbget();
+  for (const userId of userIds) {
+    try {
+      await bot.telegram.sendMessage(userId, message);
+    } catch (error) {
+      // Check if it's a rate limit error
+      if (error.code === 429) {
+        // The 'parameters' field provides info about the rate limit
+        const waitTime = error.parameters.retry_after;
+        await new Promise(resolve => setTimeout(resolve, waitTime * 1001)); // Wait for the specified time
+
+        // Once the wait is over, attempt to send the message again
+        await bot.telegram.sendMessage(userId, message);
+      } else {
+        console.log(`Failed to send message to ${userId}:`, error.description);
+        await dbdelete(userId);
+      }
+    }
+  }
+}
+
+
+
 })()
+
+
