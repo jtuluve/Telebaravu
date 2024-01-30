@@ -48,6 +48,7 @@ async function dbupdate(userid, keys, values) {
  */
 async function dbget(userid, func) {
   try {
+    if(!userid) return await users.find({});
     const result = await users.findOne({ userid });
     await func(result?._doc);
   } catch (err) {
