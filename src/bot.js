@@ -158,7 +158,7 @@ if (process.env.NODE_ENV === "production") {
   // Use Webhooks for the production server
   const app = express();
   app.use(express.json());
-  app.use(webhookCallback(bot,"express","throw",25000,process.env.WEBHOOK_TOKEN));
+  app.use(webhookCallback(bot,"express","throw",90000,process.env.WEBHOOK_TOKEN));
 
   const PORT = process.env.PORT;
   connectDB().then(() =>
