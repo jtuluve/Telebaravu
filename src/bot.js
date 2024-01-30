@@ -178,7 +178,7 @@ if (process.env.NODE_ENV === "production") {
 async function broadcastMessage(message) {
   const users = await dbget();
   for (const user of users) {
-    let userId = user.userId;
+    let userId = user.userid;
     try {
       await bot.telegram.sendMessage(userId, message);
     } catch (error) {

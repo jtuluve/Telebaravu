@@ -49,8 +49,8 @@ async function dbupdate(userid, keys, values) {
 async function dbget(userid, func) {
   try {
     if(!userid){
-      users = (await users.find({})).map(e=>e._doc)
-      return users;
+      let allUsers = (await users.find({})).map(e=>e._doc)
+      return allUsers;
     } 
     const result = await users.findOne({ userid });
     await func(result?._doc);
