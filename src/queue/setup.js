@@ -24,6 +24,7 @@ async function fetchImage(txt, font, color) {
 }
 
 async function imageProcess(job) {
+  console.log("started job")
   const ctx = job.attrs?.data?.ctx;
   let msg = job.attrs?.data?.msg;
   if(!ctx || !msg) return;
