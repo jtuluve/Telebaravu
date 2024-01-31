@@ -1,3 +1,6 @@
+
+const { connectAgenda,queue } = require("./queue/setup");
+
 (async()=>{
 
 
@@ -126,28 +129,7 @@ bot.on("message:text", async (ctx) => {
     ctx.message.from.id,
     "It will take some time for me to generate png. Please wait..😇"
   );
-  await dbget(ctx.message.from.id, async (row) => {
-    let txt = ctx.message.text;
-
-    txt = transcript(txt);
-    txt = encodeURIComponent(txt);
-    let color = row ? row.color : "red";
-    let font = row ? row.font : "baravu";
-    try {
-      let response = await fetch(
-        `https://tulu-png-api2.glitch.me/image?text=${txt}&font=${font}&color=${color}`
-      );
-
-      response = await response.json();
-      await ctx.replyWithDocument(
-        new InputFile(new URL(response.url), "image.png")
-      );
-      bot.api.deleteMessage(ctx.message.from.id, msg.message_id);
-      incrementCount(ctx.message.from.id)
-    } catch (e) {
-      console.error(e);
-    }
-  });
+  queue.now("image",{ctx:ctx.update, msg});
 });
 
 // Start the server
@@ -164,13 +146,15 @@ if (process.env.NODE_ENV === "production") {
 
   const PORT = process.env.PORT;
   connectDB().then(() =>
-    app.listen(PORT, () => {
-      console.log(`Bot listening on port ${PORT}`);
+    connectAgenda().then(()=>{
+      app.listen(PORT, () => {
+        console.log(`Bot listening on port ${PORT}`);
+      })
     })
   );
 } else {
   // Use Long Polling for development
-  connectDB().then(()=>bot.start())
+  connectDB().then(()=>connectAgenda().then(()=>bot.start()))
 }
 
 
@@ -178,8 +162,8 @@ if (process.env.NODE_ENV === "production") {
 
 async function broadcastMessage(message) {
   const users = await dbget();
-  for (const user of users) {
-    let userId = user.userid;
+  for (let i in users) {
+    let userId = users[i].userid;
     try {
       await bot.api.sendMessage(userId, message);
     } catch (error) {
@@ -188,9 +172,7 @@ async function broadcastMessage(message) {
         // The 'parameters' field provides info about the rate limit
         const waitTime = error.parameters.retry_after;
         await new Promise(resolve => setTimeout(resolve, waitTime * 1001)); // Wait for the specified time
-
-        // Once the wait is over, attempt to send the message again
-        await bot.api.sendMessage(userId, message);
+        i--;
       } else {
         console.log(`Failed to send message to ${userId}:`, error);
         await dbdelete(userId);
@@ -198,9 +180,4 @@ async function broadcastMessage(message) {
     }
   }
 }
-
-
-
 })()
-
-
