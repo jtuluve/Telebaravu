@@ -7,7 +7,6 @@ import {
   dbcreate,
   dbget,
   dbupdate,
-  incrementCount,
   dbdelete,
 } from "./dbfunc.js";
 
