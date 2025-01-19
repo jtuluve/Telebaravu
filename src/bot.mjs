@@ -1,32 +1,31 @@
-
-const { connectAgenda,queue } = require("./queue/setup");
-
-(async()=>{
-
-
-const { webhookCallback, Bot, InlineKeyboard, InputFile } = require("grammy");
-
-const express = require("express");
-const {default:fetch} = await import("node-fetch")
-const { transcript } = require("./transcript");
-const { connectDB, dbcreate, dbget, dbupdate, incrementCount, dbdelete } = require("./dbfunc");
-//database
+import { connectAgenda, queue } from "./queue/setup.js";
+import { webhookCallback, Bot, InlineKeyboard } from "grammy";
+import express, { json } from "express";
+const { default: fetch } = await import("node-fetch");
+import {
+  connectDB,
+  dbcreate,
+  dbget,
+  dbupdate,
+  incrementCount,
+  dbdelete,
+} from "./dbfunc.js";
 
 const bot = new Bot(process.env.BOT_TOKEN);
 // Bot code
 
-bot.command(process.env.BROADCAST_CODE,(ctx)=>{
-  let message = ctx.message.text.slice(process.env.BROADCAST_CODE.length+1);
+bot.command(process.env.BROADCAST_CODE, (ctx) => {
+  let message = ctx.message.text.slice(process.env.BROADCAST_CODE.length + 1);
   broadcastMessage(message);
-  return ctx.reply("Broadcasting message.")
-})
+  return ctx.reply("Broadcasting message.");
+});
 
 bot.on("message", async (ctx, next) => {
   try {
     await dbcreate(ctx.message.from.id);
-    fetch(`https://tulu-png-api2.glitch.me/`);
+    fetch(process.env.PNG_API);
   } catch (e) {
-    console.error("line 25: ", e);
+    console.error(e);
   }
   return next();
 });
@@ -129,36 +128,36 @@ bot.on("message:text", async (ctx) => {
     ctx.message.from.id,
     "It will take some time for me to generate png. Please wait..😇"
   );
-  queue.now("image",{ctx:ctx.update, msg});
+  queue.now("image", { ctx: ctx.update, msg });
 });
 
 // Start the server
+const app = express();
 if (process.env.NODE_ENV === "production") {
-  bot.api.setWebhook(
-    process.env.CYCLIC_URL , {
+  bot.api.setWebhook(process.env.CYCLIC_URL, {
     secret_token: process.env.WEBHOOK_TOKEN,
-    
   });
   // Use Webhooks for the production server
-  const app = express();
-  app.use(express.json());
-  app.use(webhookCallback(bot,"express","throw",90000,process.env.WEBHOOK_TOKEN));
+  app.get("/", (req, res) => res.send("Hello World!"));
+  app.get("*", (req, res, next) => {
+    console.log("req");
+    next();
+  });
+  app.use(json());
+  app.use(
+    webhookCallback(bot, "express", "throw", 90000, process.env.WEBHOOK_TOKEN)
+  );
 
   const PORT = process.env.PORT;
-  connectDB().then(() =>
-    connectAgenda().then(()=>{
-      app.listen(PORT, () => {
-        console.log(`Bot listening on port ${PORT}`);
-      })
-    })
-  );
+  await connectDB();
+  await connectAgenda();
+  app.listen(PORT, () => {
+    console.log(`Bot listening on port ${PORT}`);
+  });
 } else {
   // Use Long Polling for development
-  connectDB().then(()=>connectAgenda().then(()=>bot.start()))
+  connectDB().then(() => connectAgenda().then(() => bot.start()));
 }
-
-
-
 
 async function broadcastMessage(message) {
   const users = await dbget();
@@ -171,7 +170,7 @@ async function broadcastMessage(message) {
       if (error.code === 429) {
         // The 'parameters' field provides info about the rate limit
         const waitTime = error.parameters.retry_after;
-        await new Promise(resolve => setTimeout(resolve, waitTime * 1001)); // Wait for the specified time
+        await new Promise((resolve) => setTimeout(resolve, waitTime * 1001)); // Wait for the specified time
         i--;
       } else {
         console.log(`Failed to send message to ${userId}:`, error);
@@ -180,4 +179,4 @@ async function broadcastMessage(message) {
     }
   }
 }
-})()
+export default app;

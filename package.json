@@ -1,8 +1,8 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node src/bot.js",
-    "dev": "env-cmd ts-node-dev src/bot.js",
+    "start": "node src/bot.mjs",
+    "dev": "env-cmd ts-node-dev src/bot.mjs",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
@@ -17,6 +17,7 @@
   "dependencies": {
     "agenda": "^5.0.0",
     "chai": "^5.0.3",
+    "dotenv": "^16.4.7",
     "express": "^4.18.2",
     "grammy": "^1.11.2",
     "mongoose": "^8.1.1",

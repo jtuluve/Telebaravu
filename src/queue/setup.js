@@ -1,7 +1,9 @@
 const { Agenda } = require("agenda");
-const { transcript } = require("../transcript");
-const { dbget, incrementCount } = require("../dbfunc");
+const { transcript } = require("../transcript.js");
+const { dbget, incrementCount } = require("../dbfunc.js");
 const { Bot, InputFile } = require("grammy");
+require("dotenv").config();
+
 const bot = new Bot(process.env.BOT_TOKEN);
 const queue = new Agenda({
   db: {
@@ -19,14 +21,15 @@ exports.queue = queue;
 async function fetchImage(txt, font, color) {
   const { default: fetch } = await import("node-fetch");
   return await fetch(
-    `https://tulu-png-api2.glitch.me/image?text=${txt}&font=${font}&color=${color}`
+    `${process.env.PNG_API}/image?text=${txt}&font=${font}&color=${color}`
   );
 }
 
 async function imageProcess(job) {
+  console.log("Running job");
   const ctx = job.attrs?.data?.ctx;
   let msg = job.attrs?.data?.msg;
-  if(!ctx || !msg) return;
+  if (!ctx || !msg) return;
   await dbget(ctx.message.from.id, async (row) => {
     let txt = ctx.message.text;
 
