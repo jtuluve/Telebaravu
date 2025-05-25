@@ -34,23 +34,22 @@ async function imageProcess(job: Job<{ ctx: Context["update"], retries: number, 
     const ctx = job.attrs?.data?.ctx;
     let msg = job.attrs?.data?.msg;
     if (!ctx || !msg) return;
-    await dbget(ctx.message.from.id, async (row) => {
-      let txt = ctx.message.text;
+    const row = await dbget(ctx.message.from.id);
+    let txt = ctx.message.text;
 
-      txt = transcript(txt);
-      txt = encodeURIComponent(txt);
-      let color = row ? row.color : "red";
-      let font = row ? row.font : "baravu";
-      let response = await fetchImage(txt, font, color);
+    txt = transcript(txt);
+    txt = encodeURIComponent(txt);
+    let color = row ? row.color : "red";
+    let font = row ? row.font : "baravu";
+    let response = await fetchImage(txt, font, color);
 
-      response = await response.json();
-      await bot.api.sendDocument(
-        ctx.message.from.id,
-        new InputFile(new URL(response.url), "image.png")
-      );
-      bot.api.deleteMessage(ctx.message.from.id, msg.message_id);
-      incrementCount(ctx.message.from.id);
-    });
+    response = await response.json();
+    await bot.api.sendDocument(
+      ctx.message.from.id,
+      new InputFile(new URL(response.url), "image.png")
+    );
+    bot.api.deleteMessage(ctx.message.from.id, msg.message_id);
+    incrementCount(ctx.message.from.id);
   } catch (e) {
     console.log(e);
     const retries = job.attrs.data?.retries || 0;
