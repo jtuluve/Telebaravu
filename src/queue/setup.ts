@@ -55,10 +55,10 @@ async function imageProcess(job: Job<{ ctx: Context["update"], retries: number, 
     const retries = job.attrs.data?.retries || 0;
     if (retries < 3) {
       console.log("Retrying job in 1 minute...");
-      await queue.schedule("in 1 minute", "image", {
+      setTimeout(async () => await queue.now("image", {
         ...job.attrs.data,
         retries: retries + 1,
-      });
+      }), 60000)
     }
   }
 }
