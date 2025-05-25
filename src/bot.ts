@@ -21,6 +21,7 @@ bot.on("message", async (ctx, next) => {
   }
   return next();
 });
+
 bot.command("start", (ctx) => {
   ctx.reply(
     "<b>Hello there!! Read this before using the bot</b>\nI can send a png image in <b>Tulu script</b> if you provide the text in <b>Kannada or Malayalam script</b>. \n You can select your own color and font. \nFor a list of available commands send /commands or /help.",
@@ -68,6 +69,7 @@ bot.command("setcolor", async (ctx) => {
     reply_markup: keyboard,
   });
 });
+
 //user color set action
 bot.callbackQuery(/setcolor (.+)/, async (ctx) => {
   await dbupdate(ctx.update.callback_query.from.id, { color: ctx.match[1] });
@@ -127,7 +129,7 @@ bot.on("message", async (ctx) => {
 const app = express();
 async function startServer(){
   if (process.env.NODE_ENV === "production") {
-    bot.api.setWebhook(process.env.HOSTED_URL!, {
+    await bot.api.setWebhook(process.env.HOSTED_URL!, {
       secret_token: process.env.WEBHOOK_TOKEN,
     });
     // Use Webhooks for prod

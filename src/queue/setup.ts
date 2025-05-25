@@ -25,7 +25,7 @@ async function fetchImage(txt: string, font: string, color: string) {
   );
 }
 
-async function imageProcess(job: Job<{ ctx: Context, retries: number, msg: Message }>) {
+async function imageProcess(job: Job<{ ctx: Context["update"], retries: number, msg: Message }>) {
   try {
     console.log("Running job");
     if (job.attrs.data.retries) {
