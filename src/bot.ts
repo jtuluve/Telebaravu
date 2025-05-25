@@ -1,14 +1,13 @@
 import { connectAgenda, queue } from "./queue/setup.js";
 import { webhookCallback, Bot, InlineKeyboard } from "grammy";
 import express, { json } from "express";
-const { default: fetch } = await import("node-fetch");
-import { connectDB, dbcreate, dbget, dbupdate, dbdelete } from "./dbfunc.js";
+import { connectDB, dbcreate, dbget, dbupdate, dbdelete, User } from "./dbfunc";
 
-const bot = new Bot(process.env.BOT_TOKEN);
+const bot = new Bot(process.env.BOT_TOKEN!);
 // Bot code
 
-bot.command(process.env.BROADCAST_CODE, (ctx) => {
-  let message = ctx.message.text.slice(process.env.BROADCAST_CODE.length + 1);
+bot.command(process.env.BROADCAST_CODE!, (ctx) => {
+  let message = ctx.message!.text.slice(process.env.BROADCAST_CODE!.length + 1);
   broadcastMessage(message);
   return ctx.reply("Broadcasting message.");
 });
@@ -16,7 +15,7 @@ bot.command(process.env.BROADCAST_CODE, (ctx) => {
 bot.on("message", async (ctx, next) => {
   try {
     await dbcreate(ctx.message.from.id);
-    fetch(process.env.PNG_API);
+    fetch(process.env.PNG_API!);
   } catch (e) {
     console.error(e);
   }
@@ -71,7 +70,7 @@ bot.command("setcolor", async (ctx) => {
 });
 //user color set action
 bot.callbackQuery(/setcolor (.+)/, async (ctx) => {
-  await dbupdate(ctx.update.callback_query.from.id, ["color"], [ctx.match[1]]);
+  await dbupdate(ctx.update.callback_query.from.id, { color: ctx.match[1] });
   ctx.reply(`Your color has been updated to ${ctx.match[1]}`);
   return;
 });
@@ -90,23 +89,20 @@ bot.command("setfont", async (ctx) => {
 //user font set action
 bot.callbackQuery(/setfont (.+)/, (ctx) => {
   ctx.reply(`Your font has been updated to: ${ctx.match[1]}`);
-  dbupdate(ctx.update.callback_query.from.id, ["font"], [ctx.match[1]]);
+  dbupdate(ctx.update.callback_query.from.id, { font: ctx.match[1] });
   return;
 });
 
-bot.command("mycolor", (ctx) => {
-  dbget(ctx.message.from.id, (row) => {
-    if (row) ctx.reply(`Your default png color is ${row.color || "red"}`);
-    else ctx.reply("Your default png color is red");
-  });
+bot.command("mycolor", async (ctx) => {
+  const row = await dbget(ctx.message!.from.id) as User;
+  ctx.reply(`Your default png color is ${row?.color || "red"}`);
 });
 
-bot.command("myfont", (ctx) => {
-  dbget(ctx.message.from.id, (row) => {
-    if (row) ctx.reply(`Your default png font is ${row.font}`);
-    else ctx.reply("Your default png font is baravu");
-  });
+bot.command("myfont", async (ctx) => {
+  const row = await dbget(ctx.message!.from.id) as User;
+  ctx.reply(`Your default png font is ${row?.font || "baravu"}`);
 });
+
 
 bot.command("image", (ctx) => {
   ctx.reply(
@@ -129,31 +125,34 @@ bot.on("message", async (ctx) => {
 });
 
 const app = express();
-if (process.env.NODE_ENV === "production") {
-  bot.api.setWebhook(process.env.HOSTED_URL, {
-    secret_token: process.env.WEBHOOK_TOKEN,
-  });
-  // Use Webhooks for prod
-  app.get("/", (_req, res) => res.send("Hello World!"));
-  app.use(json());
-  app.use(
-    webhookCallback(bot, "express", "throw", 90000, process.env.WEBHOOK_TOKEN)
-  );
-
-  const PORT = process.env.PORT;
-  await connectDB();
-  await connectAgenda();
-  app.listen(PORT, () => {
-    console.log(`Bot listening on port ${PORT}`);
-  });
-} else {
-  // Use Long Polling for development
-  connectDB().then(() => connectAgenda().then(() => bot.start()));
+async function startServer(){
+  if (process.env.NODE_ENV === "production") {
+    bot.api.setWebhook(process.env.HOSTED_URL!, {
+      secret_token: process.env.WEBHOOK_TOKEN,
+    });
+    // Use Webhooks for prod
+    app.get("/", (_req, res) => res.send("Hello World!"));
+    app.use(json());
+    app.use(
+      webhookCallback(bot, "express", "throw", 90000, process.env.WEBHOOK_TOKEN)
+    );
+  
+    const PORT = process.env.PORT;
+    await connectDB();
+    await connectAgenda();
+    app.listen(PORT, () => {
+      console.log(`Bot listening on port ${PORT}`);
+    });
+  } else {
+    // Use Long Polling for development
+    connectDB().then(() => connectAgenda().then(() => bot.start()));
+  }
 }
 
 async function broadcastMessage(message) {
-  const users = await dbget();
-  for (let i in users) {
+  const users = await dbget() as User[];
+
+  for (let i = 0; i < users.length; i++) {
     let userId = users[i].userid;
     try {
       await bot.api.sendMessage(userId, message);
@@ -170,5 +169,7 @@ async function broadcastMessage(message) {
     }
   }
 }
+
+startServer();
 
 export default app;

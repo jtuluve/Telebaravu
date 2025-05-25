@@ -1,8 +1,8 @@
 {
   "scripts": {
     "build": "tsc",
-    "start": "node src/bot.mjs",
-    "dev": "env-cmd ts-node-dev src/bot.mjs",
+    "start": "node dist/bot.js",
+    "dev": "env-cmd ts-node-dev src/bot.ts",
     "test": "node --test"
   },
   "devDependencies": {

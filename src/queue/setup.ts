@@ -1,35 +1,31 @@
-const { Agenda, Job } = require("agenda");
+import { Agenda, Job } from "agenda";
+import { Bot, InputFile, Context } from "grammy";
+import { Message } from "grammy/types";
+
 const { transcript } = require("../transcript.js");
 const { dbget, incrementCount } = require("../dbfunc.js");
-const { Bot, InputFile, Context } = require("grammy");
 require("dotenv").config();
 
 const bot = new Bot(process.env.BOT_TOKEN);
-const queue = new Agenda({
+export const queue = new Agenda({
   db: {
     address: process.env.MONGO_URL,
   },
 });
-exports.connectAgenda = async () => {
+export const connectAgenda = async () => {
   queue.define("image", imageProcess);
 
   console.log("Connected to agenda");
   await queue.start();
 };
-exports.queue = queue;
 
-async function fetchImage(txt, font, color) {
-  const { default: fetch } = await import("node-fetch");
+async function fetchImage(txt: string, font: string, color: string) {
   return await fetch(
     `${process.env.PNG_API}/image?text=${txt}&font=${font}&color=${color}`
   );
 }
-/**
- *
- * @param {Job} job
- * @returns
- */
-async function imageProcess(job) {
+
+async function imageProcess(job: Job<{ ctx: Context, retries: number, msg: Message }>) {
   try {
     console.log("Running job");
     if (job.attrs.data.retries) {
