@@ -1,4 +1,5 @@
 {
+  "main": "dist/bot.js",
   "scripts": {
     "build": "tsc",
     "start": "node dist/bot.js",
