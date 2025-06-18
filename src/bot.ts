@@ -96,12 +96,12 @@ bot.callbackQuery(/setfont (.+)/, (ctx) => {
 });
 
 bot.command("mycolor", async (ctx) => {
-  const row = await dbget(ctx.message!.from.id) as User;
+  const row = await dbget(ctx.message!.from.id);
   ctx.reply(`Your default png color is ${row?.color || "red"}`);
 });
 
 bot.command("myfont", async (ctx) => {
-  const row = await dbget(ctx.message!.from.id) as User;
+  const row = await dbget(ctx.message!.from.id);
   ctx.reply(`Your default png font is ${row?.font || "baravu"}`);
 });
 
@@ -151,8 +151,8 @@ async function startServer(){
   }
 }
 
-async function broadcastMessage(message) {
-  const users = await dbget() as User[];
+async function broadcastMessage(message: string) {
+  const users = await dbget();
 
   for (let i = 0; i < users.length; i++) {
     let userId = users[i].userid;

@@ -45,6 +45,8 @@ export async function dbupdate(userid: number, update: Record<any, any>) {
   }
 }
 
+export async function dbget(): Promise<User[]>;
+export async function dbget(userid: number): Promise<User | null>;
 export async function dbget(userid?: number) {
   try {
     if (!userid) {

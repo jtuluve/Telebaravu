@@ -2,8 +2,8 @@ import { Agenda, Job } from "agenda";
 import { Bot, InputFile, Context } from "grammy";
 import { Message } from "grammy/types";
 
-const { transcript } = require("../transcript.js");
-const { dbget, incrementCount } = require("../dbfunc.js");
+import { transcript } from "../transcript";
+import { dbget, incrementCount, User } from "../dbfunc";
 require("dotenv").config();
 
 const bot = new Bot(process.env.BOT_TOKEN);
