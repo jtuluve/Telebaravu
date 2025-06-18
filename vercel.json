@@ -15,7 +15,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/bot.js"
+      "dest": "dist"
     }
   ]
 }
