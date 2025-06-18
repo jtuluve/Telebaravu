@@ -1,9 +1,21 @@
 {
   "version": 2,
-  "rewrites": [
+  "buildCommand": "npm run build",
+  "builds": [
     {
-      "source": "/(.*)",
-      "destination": "/dist/bot.js"
+      "src": "dist/bot.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "dist/**"
+        ]
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "dist/bot.js"
     }
   ]
 }
