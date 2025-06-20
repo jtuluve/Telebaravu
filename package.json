@@ -1,7 +1,9 @@
 {
+  "main": "api/index.js",
+  "type": "commonjs",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/bot.js",
+    "start": "node api/index.js",
     "dev": "env-cmd ts-node-dev src/bot.ts",
     "test": "node --test"
   },

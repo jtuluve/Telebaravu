@@ -96,12 +96,12 @@ bot.callbackQuery(/setfont (.+)/, (ctx) => {
 });
 
 bot.command("mycolor", async (ctx) => {
-  const row = await dbget(ctx.message!.from.id) as User;
+  const row = await dbget(ctx.message!.from.id);
   ctx.reply(`Your default png color is ${row?.color || "red"}`);
 });
 
 bot.command("myfont", async (ctx) => {
-  const row = await dbget(ctx.message!.from.id) as User;
+  const row = await dbget(ctx.message!.from.id);
   ctx.reply(`Your default png font is ${row?.font || "baravu"}`);
 });
 
@@ -126,33 +126,10 @@ bot.on("message", async (ctx) => {
   return await ctx.reply("👀");
 });
 
-const app = express();
-async function startServer(){
-  if (process.env.NODE_ENV === "production") {
-    await bot.api.setWebhook(process.env.HOSTED_URL!, {
-      secret_token: process.env.WEBHOOK_TOKEN,
-    });
-    // Use Webhooks for prod
-    app.get("/", (_req, res) => res.send("Hello World!"));
-    app.use(json());
-    app.use(
-      webhookCallback(bot, "express", "throw", 90000, process.env.WEBHOOK_TOKEN)
-    );
-  
-    const PORT = process.env.PORT;
-    await connectDB();
-    await connectAgenda();
-    app.listen(PORT, () => {
-      console.log(`Bot listening on port ${PORT}`);
-    });
-  } else {
-    // Use Long Polling for development
-    connectDB().then(() => connectAgenda().then(() => bot.start()));
-  }
-}
 
-async function broadcastMessage(message) {
-  const users = await dbget() as User[];
+
+async function broadcastMessage(message: string) {
+  const users = await dbget();
 
   for (let i = 0; i < users.length; i++) {
     let userId = users[i].userid;
@@ -172,6 +149,5 @@ async function broadcastMessage(message) {
   }
 }
 
-startServer();
 
-export default app;
+export default bot;

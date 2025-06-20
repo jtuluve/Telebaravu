@@ -1,4 +1,4 @@
-function transcript(txt) {
+export function transcript(txt: string) {
   txt = txt.replace(/್‍/g, "ä").replace(/‍/g, "");
 
   let E = txt.indexOf("ೆ*");
@@ -490,5 +490,3 @@ function transcript(txt) {
 
   return txt;
 }
-
-exports.transcript = transcript;
