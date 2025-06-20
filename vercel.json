@@ -9,7 +9,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/bot.js"
+      "dest": "api/"
     }
   ]
 }
