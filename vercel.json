@@ -11,6 +11,5 @@
       "src": "/(.*)",
       "dest": "api/"
     }
-  ],
-  "buildCommand": "npm run build"
+  ]
 }
