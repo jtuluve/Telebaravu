@@ -1,8 +1,20 @@
 {
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "functions": {
-    "api/bot.js": {
-      "includeFiles": "dist/**"
+  "version": 2,
+  "builds": [
+    {
+      "src": "dist/bot.js",
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "dist/**"
+        ]
+      }
     }
-  }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "dist/bot.js"
+    }
+  ]
 }
