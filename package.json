@@ -1,6 +1,6 @@
 {
   "main": "dist/bot.js",
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build": "tsc",
     "start": "node dist/bot.js",
