@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
   "builds": [
     {
       "src": "dist/bot.js",
@@ -15,7 +14,7 @@
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist"
+      "dest": "bot.js"
     }
   ]
 }
