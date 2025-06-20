@@ -16,12 +16,8 @@ async function startServer() {
       webhookCallback(bot, "express", "throw", 90000, process.env.WEBHOOK_TOKEN)
     );
 
-    const PORT = process.env.PORT;
     await connectDB();
     await connectAgenda();
-    app.listen(PORT, () => {
-      console.log(`Bot listening on port ${PORT}`);
-    });
   } else {
     // Use Long Polling for development
     connectDB().then(() => connectAgenda().then(() => bot.start()));
