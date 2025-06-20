@@ -126,30 +126,7 @@ bot.on("message", async (ctx) => {
   return await ctx.reply("👀");
 });
 
-const app = express();
-async function startServer(){
-  if (process.env.NODE_ENV === "production") {
-    await bot.api.setWebhook(process.env.HOSTED_URL!, {
-      secret_token: process.env.WEBHOOK_TOKEN,
-    });
-    // Use Webhooks for prod
-    app.get("/", (_req, res) => res.send("Hello World!"));
-    app.use(json());
-    app.use(
-      webhookCallback(bot, "express", "throw", 90000, process.env.WEBHOOK_TOKEN)
-    );
-  
-    const PORT = process.env.PORT;
-    await connectDB();
-    await connectAgenda();
-    app.listen(PORT, () => {
-      console.log(`Bot listening on port ${PORT}`);
-    });
-  } else {
-    // Use Long Polling for development
-    connectDB().then(() => connectAgenda().then(() => bot.start()));
-  }
-}
+
 
 async function broadcastMessage(message: string) {
   const users = await dbget();
@@ -172,6 +149,5 @@ async function broadcastMessage(message: string) {
   }
 }
 
-startServer();
 
-export default app;
+export default bot;
