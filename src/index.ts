@@ -6,9 +6,9 @@ import { connectAgenda } from "./queue/setup";
 const app = express();
 async function startServer() {
   if (process.env.NODE_ENV === "production") {
-    await bot.api.setWebhook(process.env.HOSTED_URL!, {
-      secret_token: process.env.WEBHOOK_TOKEN,
-    });
+    // await bot.api.setWebhook(process.env.HOSTED_URL!, {
+    //   secret_token: process.env.WEBHOOK_TOKEN,
+    // });
     // Use Webhooks for prod
     app.get("/", (_req, res) => res.send("Hello World!"));
     app.use(json());
