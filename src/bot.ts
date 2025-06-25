@@ -2,6 +2,8 @@ import { connectAgenda, queue } from "./queue/setup.js";
 import { webhookCallback, Bot, InlineKeyboard } from "grammy";
 import express, { json } from "express";
 import { connectDB, dbcreate, dbget, dbupdate, dbdelete, User } from "./dbfunc";
+import dotenv from "dotenv";
+dotenv.config()
 
 const bot = new Bot(process.env.BOT_TOKEN!);
 // Bot code
