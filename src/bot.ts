@@ -118,27 +118,30 @@ bot.on("message:sticker", (ctx) => ctx.reply("❤️"));
 import { InputFile } from "telegraf";
 
 bot.on("message:text", async (ctx) => {
-  const txt = encodeURIComponent(ctx.message.text);
-  const row = await dbget(ctx.message.from.id);
-  const font = row?.font || "baravu";
-  const color = row?.color || "red";
+  const userId = ctx.from?.id;
+  const text = ctx.message.text;
 
-  const waitMsg = await ctx.reply("It will take some time for me to generate PNG. Please wait... 😇");
+  if (!userId || !text) return;
+
+  const waitMsg = await ctx.api.sendMessage(userId, "It will take some time for me to generate PNG. Please wait... 😇");
 
   try {
-    const res = await fetch(`${process.env.PNG_API}/image?text=${txt}&font=${font}&color=${color}`);
+    const row = await dbget(userId);
+    const font = row?.font || "baravu";
+    const color = row?.color || "red";
+    const encodedText = encodeURIComponent(text);
+
+    const res = await fetch(`${process.env.PNG_API}/image?text=${encodedText}&font=${font}&color=${color}`);
     const data = await res.json();
 
-    if (!data.url) {
-      throw new Error("Invalid response from image API");
-    }
+    if (!data.url) throw new Error("No image URL in response");
 
-    await ctx.sendDocument(new InputFile(data.url, "image.png"));
+    await ctx.api.sendDocument(userId, new InputFile(data.url, "image.png"));
 
-    await ctx.deleteMessage(waitMsg.message_id);
-  } catch (error) {
-    console.error("Error while processing image:", error);
-    await ctx.reply("Failed to generate PNG. Please try again later.");
+    await ctx.api.deleteMessage(userId, waitMsg.message_id);
+  } catch (e) {
+    console.error("Failed to process image:", e);
+    await ctx.api.sendMessage(userId, "Something went wrong while generating the image 😓");
   }
 });
 
