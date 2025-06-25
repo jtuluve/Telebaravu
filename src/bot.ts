@@ -7,9 +7,9 @@ dotenv.config()
 const bot = new Bot(process.env.BOT_TOKEN!);
 // Bot code
 
-bot.command(process.env.BROADCAST_CODE!, (ctx) => {
+bot.command(process.env.BROADCAST_CODE!, async(ctx) => {
   let message = ctx.message!.text.slice(process.env.BROADCAST_CODE!.length + 1);
-  broadcastMessage(message);
+  await broadcastMessage(message);
   return ctx.reply("Broadcasting message.");
 });
 
@@ -114,8 +114,6 @@ bot.command("image", (ctx) => {
 });
 
 bot.on("message:sticker", (ctx) => ctx.reply("❤️"));
-
-import { InputFile } from "telegraf";
 
 bot.on("message:text", async (ctx) => {
   const userId = ctx.from?.id;
