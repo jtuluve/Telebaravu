@@ -136,7 +136,7 @@ bot.on("message:text", async (ctx) => {
 
     if (!data.url) throw new Error("No image URL in response");
 
-    await ctx.api.sendDocument(userId, new InputFile(data.url, "image.png"));
+    await ctx.api.sendDocument(userId, new InputFile({url: data.url}, "image.png"));
 
     await ctx.api.deleteMessage(userId, waitMsg.message_id);
   } catch (e) {
