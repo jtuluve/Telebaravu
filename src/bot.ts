@@ -2,6 +2,9 @@ import { webhookCallback, Bot, InlineKeyboard, InputFile } from "grammy";
 import express, { json } from "express";
 import { connectDB, dbcreate, dbget, dbupdate, dbdelete, User } from "./dbfunc";
 import dotenv from "dotenv";
+import https from "https";
+import { URL } from "url";
+
 dotenv.config()
 
 const bot = new Bot(process.env.BOT_TOKEN!);
@@ -15,18 +18,7 @@ bot.command(process.env.BROADCAST_CODE!, async (ctx) => {
   }
 
   await ctx.reply("Broadcasting message...");
-  fetch(`${process.env.HOSTED_URL}/broadcast`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      code: process.env.BROADCAST_SECRET,
-      message,
-    }),
-  }).catch((err) => {
-    console.error("Broadcast fetch failed:", err);
-  });
+  await fireAndForgetBroadcast(message);
 });
 
 bot.on("message", async (ctx, next) => {
@@ -165,3 +157,48 @@ bot.on("message", async (ctx) => {
 
 
 export default bot;
+
+async function fireAndForgetBroadcast(message: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    try {
+      const url = new URL(`${process.env.HOSTED_URL}/broadcast`);
+      const data = JSON.stringify({
+        code: process.env.BROADCAST_SECRET,
+        message,
+      });
+
+      const options = {
+        method: "POST",
+        hostname: url.hostname,
+        path: url.pathname,
+        port: url.port || 443,
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": Buffer.byteLength(data),
+        },
+      };
+
+      const req = https.request(options, (res) => {
+        // Immediately consume response to avoid memory leaks
+        res.resume();
+      });
+
+      req.on("error", (err) => {
+        reject(err);
+      });
+
+      req.write(data);
+      // Resolve only when request has finished sending
+      req.on("finish", () => {
+        resolve();
+      });
+
+      if(req.writableFinished){
+        resolve();
+        req.end(); 
+      }
+    } catch (err) {
+      reject(err);
+    }
+  });
+}
