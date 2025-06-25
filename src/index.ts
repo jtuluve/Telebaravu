@@ -1,7 +1,7 @@
 import express, { json } from "express";
 import { webhookCallback } from "grammy";
 import bot from "./bot";
-import { connectDB } from "./dbfunc";
+import { connectDB, dbget } from "./dbfunc";
 const app = express();
 async function startServer() {
   if (process.env.NODE_ENV === "production") {
