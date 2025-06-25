@@ -2,7 +2,6 @@ import express, { json } from "express";
 import { webhookCallback } from "grammy";
 import bot from "./bot";
 import { connectDB } from "./dbfunc";
-import { connectAgenda } from "./queue/setup";
 const app = express();
 async function startServer() {
   if (process.env.NODE_ENV === "production") {
@@ -17,7 +16,6 @@ async function startServer() {
     );
 
     await connectDB();
-    await connectAgenda();
   } else {
     // Use Long Polling for development
     connectDB().then(() => connectAgenda().then(() => bot.start()));
