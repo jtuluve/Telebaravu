@@ -1,5 +1,4 @@
-import { connectAgenda, queue } from "./queue/setup.js";
-import { webhookCallback, Bot, InlineKeyboard } from "grammy";
+import { webhookCallback, Bot, InlineKeyboard, InputFile } from "grammy";
 import express, { json } from "express";
 import { connectDB, dbcreate, dbget, dbupdate, dbdelete, User } from "./dbfunc";
 import dotenv from "dotenv";
@@ -116,12 +115,31 @@ bot.command("image", (ctx) => {
 
 bot.on("message:sticker", (ctx) => ctx.reply("❤️"));
 
+import { InputFile } from "telegraf";
+
 bot.on("message:text", async (ctx) => {
-  let msg = await bot.api.sendMessage(
-    ctx.message.from.id,
-    "It will take some time for me to generate png. Please wait..😇"
-  );
-  queue.now("image", { ctx: ctx.update, msg });
+  const txt = encodeURIComponent(ctx.message.text);
+  const row = await dbget(ctx.message.from.id);
+  const font = row?.font || "baravu";
+  const color = row?.color || "red";
+
+  const waitMsg = await ctx.reply("It will take some time for me to generate PNG. Please wait... 😇");
+
+  try {
+    const res = await fetch(`${process.env.PNG_API}/image?text=${txt}&font=${font}&color=${color}`);
+    const data = await res.json();
+
+    if (!data.url) {
+      throw new Error("Invalid response from image API");
+    }
+
+    await ctx.sendDocument(new InputFile(data.url, "image.png"));
+
+    await ctx.deleteMessage(waitMsg.message_id);
+  } catch (error) {
+    console.error("Error while processing image:", error);
+    await ctx.reply("Failed to generate PNG. Please try again later.");
+  }
 });
 
 bot.on("message", async (ctx) => {
