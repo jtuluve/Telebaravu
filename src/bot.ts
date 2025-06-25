@@ -7,10 +7,26 @@ dotenv.config()
 const bot = new Bot(process.env.BOT_TOKEN!);
 // Bot code
 
-bot.command(process.env.BROADCAST_CODE!, async(ctx) => {
-  let message = ctx.message!.text.slice(process.env.BROADCAST_CODE!.length + 1);
-  await ctx.reply("Broadcasting message.");
-  return await broadcastMessage(message);
+bot.command(process.env.BROADCAST_CODE!, async (ctx) => {
+  const message = ctx.message!.text.slice(process.env.BROADCAST_CODE!.length + 1).trim();
+
+  if (!message) {
+    return await ctx.reply("Please provide a message to broadcast.");
+  }
+
+  await ctx.reply("Broadcasting message...");
+  fetch(`${process.env.HOSTED_URL}/broadcast`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      code: process.env.BROADCAST_SECRET,
+      message,
+    }),
+  }).catch((err) => {
+    console.error("Broadcast fetch failed:", err);
+  });
 });
 
 bot.on("message", async (ctx, next) => {
@@ -146,29 +162,6 @@ bot.on("message:text", async (ctx) => {
 bot.on("message", async (ctx) => {
   return await ctx.reply("👀");
 });
-
-
-
-async function broadcastMessage(message: string) {
-  const users = await dbget();
-
-  for (let i = 0; i < users.length; i++) {
-    let userId = users[i].userid;
-    try {
-      await bot.api.sendMessage(userId, message);
-    } catch (error) {
-      // Check if it's a rate limit error
-      if (error.code === 429) {
-        const waitTime = error.parameters.retry_after;
-        await new Promise((resolve) => setTimeout(resolve, waitTime * 1001));
-        i--;
-      } else {
-        console.log(`Failed to send message to ${userId}:`, error);
-        await dbdelete(userId);
-      }
-    }
-  }
-}
 
 
 export default bot;
