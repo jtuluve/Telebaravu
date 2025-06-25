@@ -10,7 +10,7 @@ const bot = new Bot(process.env.BOT_TOKEN!);
 bot.command(process.env.BROADCAST_CODE!, async(ctx) => {
   let message = ctx.message!.text.slice(process.env.BROADCAST_CODE!.length + 1);
   await ctx.reply("Broadcasting message.");
-  await broadcastMessage(message);
+  return await broadcastMessage(message);
 });
 
 bot.on("message", async (ctx, next) => {
