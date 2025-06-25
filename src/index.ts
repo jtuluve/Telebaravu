@@ -11,9 +11,6 @@ async function startServer() {
     // Use Webhooks for prod
     app.get("/", (_req, res) => res.send("Hello World!"));
     app.use(json());
-    app.use(
-      webhookCallback(bot, "express", "throw", 90000, process.env.WEBHOOK_TOKEN)
-    );
     app.post("/broadcast", async (req, res) => {
       try {
         const { code, message } = req.body;
@@ -29,6 +26,9 @@ async function startServer() {
         res.status(500).json({ success: false, message: "Internal server error." });
       }
     });
+    app.use(
+      webhookCallback(bot, "express", "throw", 90000, process.env.WEBHOOK_TOKEN)
+    );
 
     await connectDB();
   } else {
