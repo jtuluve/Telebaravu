@@ -136,6 +136,9 @@ bot.on("message:text", async (ctx) => {
     const font = row?.font || "baravu";
     const color = row?.color || "red";
     const encodedText = encodeURIComponent(text);
+    
+    console.log("Recieved:", text);
+    console.log("Encoded:", encodedText);
 
     const res = await fetch(`${process.env.PNG_API}/image?text=${encodedText}&font=${font}&color=${color}`);
     const data = await res.json();
