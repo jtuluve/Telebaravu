@@ -4,6 +4,7 @@ import { connectDB, dbcreate, dbget, dbupdate, dbdelete, User } from "./dbfunc";
 import dotenv from "dotenv";
 import https from "https";
 import { URL } from "url";
+import { transcript } from "./transcript";
 
 dotenv.config()
 
@@ -135,10 +136,7 @@ bot.on("message:text", async (ctx) => {
     const row = await dbget(userId);
     const font = row?.font || "baravu";
     const color = row?.color || "red";
-    const encodedText = encodeURIComponent(text);
-    
-    console.log("Recieved:", text);
-    console.log("Encoded:", encodedText);
+    const encodedText = encodeURIComponent(transcript(text));
 
     const res = await fetch(`${process.env.PNG_API}/image?text=${encodedText}&font=${font}&color=${color}`);
     const data = await res.json();
