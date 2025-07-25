@@ -1,7 +1,10 @@
 import express, { json } from "express";
 import { webhookCallback } from "grammy";
 import bot from "./bot";
-import { connectDB, dbget } from "./dbfunc";
+import { connectDB, dbdelete, dbget } from "./dbfunc";
+import { connectAgenda } from "./queue/setup";
+import dotenv from "dotenv";
+dotenv.config();
 const app = express();
 async function startServer() {
   if (process.env.NODE_ENV === "production") {
