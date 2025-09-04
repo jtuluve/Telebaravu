@@ -122,6 +122,10 @@ bot.command("image", (ctx) => {
   );
 });
 
+bot.command("totalcount", async (ctx)=>{
+  return await ctx.reply(`${await getTotalCount()}`);
+});
+
 bot.on("message:sticker", (ctx) => ctx.reply("❤️"));
 
 bot.on("message:text", async (ctx) => {
@@ -151,10 +155,6 @@ bot.on("message:text", async (ctx) => {
     await ctx.api.sendMessage(userId, "Something went wrong while generating the image 😓");
   }
 });
-
-bot.command("totalcount", async (ctx)=>{
-  return await ctx.reply(`${await getTotalCount()}`);
-})
 
 bot.on("message", async (ctx) => {
   return await ctx.reply("👀");
