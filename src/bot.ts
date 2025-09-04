@@ -1,6 +1,6 @@
 import { webhookCallback, Bot, InlineKeyboard, InputFile } from "grammy";
 import express, { json } from "express";
-import { connectDB, dbcreate, dbget, dbupdate, dbdelete, User } from "./dbfunc";
+import { connectDB, dbcreate, dbget, dbupdate, dbdelete, User, getTotalCount } from "./dbfunc";
 import dotenv from "dotenv";
 import https from "https";
 import { URL } from "url";
@@ -151,6 +151,10 @@ bot.on("message:text", async (ctx) => {
     await ctx.api.sendMessage(userId, "Something went wrong while generating the image 😓");
   }
 });
+
+bot.command("totalcount", async (ctx)=>{
+  return await ctx.reply(`${await getTotalCount()}`);
+})
 
 bot.on("message", async (ctx) => {
   return await ctx.reply("👀");
